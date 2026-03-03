@@ -1,14 +1,9 @@
+---
 name: save-context
-description: >
-[Antigravity Only] Trigger this skill when handing off a project, finishing a session, or when the user asks to "save context".
-It generates a structured handoff document by scanning the current architecture and state, enabling the next agent to resume seamlessly.
-tags: [context, snapshot, handoff, memory, save-state, state-management, antigravity]
-
+description: 自动总结当前会话操作并保存交接信息(artifacts)到当前工作仓库，以便下一任开发者(agent)继续开发。
 ---
 
 # Save Context Skill
-
-> **⚠️ 注意 / WARNING**: 此技能为 **Antigravity** 专属，调用了其专有的工具（如 `view_file_outline`）。请勿在其他大模型助手（如 Cursor / Windsurf 等）上安装。
 
 在会话结束或用户请求保存上下文时，自动分析当前会话的全部操作，提取下一任 agent 所需的**前瞻性、可操作**信息，生成结构化交接文档并持久化到项目仓库中。
 
@@ -46,7 +41,7 @@ tags: [context, snapshot, handoff, memory, save-state, state-management, antigra
 
 为适应人机协作，必须主动提取并融合人类开发者在交接前提供的工作进展：
 
-- **通过对话摄取**: 如果用户在触发 `save-context` 的指令中附带了说明（例如：“我刚修了 Redis 的登录 Bug”），必须将其作为**绝对事实（Ground Truth）**纳入状态更新中。
+- **通过对话摄取**: 如果用户在触发 `save-context` 的指令中附带了说明（例如："我刚修了 Redis 的登录 Bug"），必须将其作为**绝对事实（Ground Truth）**纳入状态更新中。
 - **通过约定文件摄取**: 主动检查项目根目录或 `.agent/` 目录下是否存在如 `human_updates.md` 这样的补丁文件。如果存在，读取其内容并整合至交接文档中。
 - **融合规则**: 在生成 `handoff_context.md` 时（特别是 `Current State`, `User Decisions` 和 `Known Gotchas` 部分），显式体现由人类开发者补充的内容。
 
@@ -149,6 +144,9 @@ entry.py → module_a.py → module_b.py
    - 其他 artifacts: `{project_root}/.agent/` 目录下
 
    > **⚠️ CRITICAL**: 绝对不要保存到 agent 的 brain 目录（`<appDataDir>/brain/<conversation-id>/`）。那个目录是短暂的，会话结束后可能被清理。
+
+   > **⚠️ 搜索兼容性警告**: `.agent/` 是隐藏目录，`find_by_name`（基于 `fd`）**默认忽略隐藏目录**，无法发现其中的文件。
+   > `load-context` 的搜索策略必须使用 `list_dir` 而非 `find_by_name` 来定位此目录。
 
 2. **确认**: 向用户报告：
    - 已保存的文件列表及绝对路径

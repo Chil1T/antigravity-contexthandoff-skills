@@ -1,14 +1,9 @@
+---
 name: load-context
-description: >
-[Antigravity Only] Trigger this skill when the user asks to "resume task", "continue working", or "load context".
-It automatically locates the previous agent's handoff document and caches it into the current workspace, eliminating cold-start costs.
-tags: [context, memory, handoff, resume, continuation, state-management, antigravity]
-
+description: 在新开的窗口/会话中，查找前一个agent保存的交接artifacts并将其缓存到当前工作区，以便无缝继续开发。
 ---
 
 # Load Context Skill
-
-> **⚠️ 注意 / WARNING**: 此技能为 **Antigravity** 专属，调用了其专有的文件系统和内部缓存工作流。请勿在其他大模型助手（如 Cursor / Windsurf 等）上安装。
 
 当用户在新会话中发出"继续开发"、"接手任务"、"恢复进度"等指令时，自动从项目仓库中查找前任 agent 保存的交接文档，分层消化并向用户汇报，实现**零冷启动**的无缝衔接。
 
@@ -18,14 +13,17 @@ tags: [context, memory, handoff, resume, continuation, state-management, antigra
 
 ## Phase 1: 定位交接文档
 
-1. 使用 `find_by_name` 在当前项目工作目录下搜索以下文件：
-   - `.agent/handoff_context.md`（主交接文档）
-   - `.agent/migration_history.md`（历史记录，可选）
-   - `.agent/` 目录下的其他 artifacts（如 `implementation_plan.md`、`project_roadmap.md` 等）
+> ⚠️ **工具限制**: `find_by_name` 底层使用 `fd`，**默认忽略以 `.` 开头的隐藏目录**（如 `.agent/`）。
+> 搜索隐藏目录时**必须使用 `list_dir`**，不得依赖 `find_by_name`。
 
-2. 如果在 `.agent/` 目录未找到，扩大搜索范围：
+1. **首先**直接使用 `list_dir` 检查 `{project_root}/.agent/` 目录：
+   - 如果目录存在，直接读取其中的文件：
+     - `.agent/handoff_context.md`（主交接文档）
+     - `.agent/migration_history.md`（历史记录，可选）
+     - `.agent/` 目录下的其他 artifacts（如 `implementation_plan.md`、`project_roadmap.md` 等）
+
+2. 如果 `.agent/` 目录不存在，使用 `list_dir` 检查 `.agents/` 目录，并使用 `find_by_name` 在项目根目录下搜索非隐藏路径中的：
    - 项目根目录下的 `handoff_context.md`
-   - `.agents/` 目录
    - 项目根目录下其他可能由前任 agent 创建的 `.md` 文件
 
 3. 如果**仍未找到任何交接文档**：
