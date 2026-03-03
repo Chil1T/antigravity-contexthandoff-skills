@@ -21,7 +21,7 @@ This repository provides two highly-engineered, standardized hand-off protocol s
 Using [skills.sh](https://skills.sh):
 
 ```bash
-npx skills add <your-github-username>/antigravity-context-skills
+npx skills add Chil1T/antigravity-contexthandoff-skills
 ```
 
 _(Make sure to run this inside an Antigravity environment)._
@@ -53,7 +53,7 @@ Because these skills are optimized with standard tags like `handoff`, `memory`, 
 使用 [skills.sh](https://skills.sh):
 
 ```bash
-npx skills add <你的GitHub用户名>/antigravity-context-skills
+npx skills add Chil1T/antigravity-contexthandoff-skills
 ```
 
 _（请确保在具有 Antigravity 环境的项目下使用）_
