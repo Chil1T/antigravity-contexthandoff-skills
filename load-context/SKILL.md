@@ -17,12 +17,14 @@ description: 在新开的窗口/会话中，查找前一个agent保存的交接a
 > 搜索隐藏目录时**必须使用 `list_dir`**，不得依赖 `find_by_name`。
 
 1. **首先**直接使用 `list_dir` 检查 `{project_root}/.agent/` 目录：
+
    - 如果目录存在，直接读取其中的文件：
      - `.agent/handoff_context.md`（主交接文档）
      - `.agent/migration_history.md`（历史记录，可选）
      - `.agent/` 目录下的其他 artifacts（如 `implementation_plan.md`、`project_roadmap.md` 等）
 
 2. 如果 `.agent/` 目录不存在，使用 `list_dir` 检查 `.agents/` 目录，并使用 `find_by_name` 在项目根目录下搜索非隐藏路径中的：
+
    - 项目根目录下的 `handoff_context.md`
    - 项目根目录下其他可能由前任 agent 创建的 `.md` 文件
 
